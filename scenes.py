@@ -1,7 +1,51 @@
+from __future__ import division
 from visual import *
 from settings import *
 from math import sqrt
+import random
 
+def viewConfig(p1, p2, goalTender2, wallL, wallR, scorePos,mode):
+    if mode == -1:
+        wallL.opacity = 1
+        wallR.opacity = 0
+        p1.scoreDisplay.pos=(-(SCOREPOSX-1),SCOREPOSY, mode*scorePos)
+        p2.scoreDisplay.pos=(-(SCOREPOSX-1),SCOREPOSY,-1 * mode * scorePos + 10)
+    else:
+        wallL.opacity = 0
+        wallR.opacity = 1
+        p1.scoreDisplay.pos=(SCOREPOSX-1,SCOREPOSY, -1 * mode * (scorePos + 10))
+        p2.scoreDisplay.pos=(SCOREPOSX-1,SCOREPOSY,mode)
+    p1.scoreDisplay.axis=(0,0,mode)
+    p2.scoreDisplay.axis=(0,0,mode)
+    p1.scoreDisplay.pos=(SCOREPOSX-1,SCOREPOSY, -210)
+    p2.scoreDisplay.pos=(SCOREPOSX-1,SCOREPOSY,200)
+
+
+    
+def add_score(scoredP, otherP):
+    scoredP.score += 1
+    scoredP.scored = True
+    scoredP.scoreDisplay.color = color.yellow
+    otherP.scoreDisplay.color = color.white
+    
+def goTowards(ball, p):
+    roomY = random.randint(0,P_Y/2)
+    roomZ = random.randint(0,P_Z/2)
+    if ball.pos.y + roomY > p.pos.y:
+        p.pos.y += PSPEED/130
+    if ball.pos.y + roomY< p.pos.y:
+        p.pos.y -= PSPEED/130
+    if ball.pos.z + roomZ > p.pos.z:
+        p.pos.z += PSPEED/130
+    if ball.pos.z + roomZ < p.pos.z:
+        p.pos.z -= PSPEED/130
+
+    
+def invisibleBall(invisible_ball, ball):
+    invisible_ball.pos = ball.pos
+    invisible_ball.velocity = invisibleBallMultiple * ball.velocity
+    
+ 
 def constantSpeed(ballSpeed, VY, VZ):
     return sqrt(abs(ballSpeed)**2 - abs(VY)**2 - abs(VZ)**2)
 
@@ -25,11 +69,13 @@ def collisionPlayer(ball, p, ballSpeed,a,b,c,d):
         dist2 = p.pos.z - ball.pos.z
         ball.velocity.z = dist2 * DEVIATION
         ball.velocity.x = d * constantSpeed(ballSpeed,ball.velocity.y, ball.velocity.z)
+        return True
 
 def collisionGoalTender(ball, goalTender, a, b, c):
     room = 2 * BALLR / 6.0 # used for collision
     if (eval("(ball.pos.x {} ball.radius {} goalTender.pos.x {} 0.5)".format(a,b,c)) and (ball.pos.y - ball.radius + room <= goalTender.pos.y + GT_Y_SIZE/2.0 and ball.pos.y + ball.radius - room >= goalTender.pos.y-GT_Y_SIZE/2.0) and (ball.pos.z - ball.radius + room <= goalTender.pos.z +GT_Z_SIZE/2.0 and ball.pos.z + ball.radius - room >= goalTender.pos.z -GT_Z_SIZE/2.0)):
         ball.velocity.x = -ball.velocity.x
+        return True
 
 def collisionWall(ball, wallU, wallD, wallF, wallB):
     if (ball.pos.y + ball.radius >= wallU.pos.y - WALL_THICK/2.0) or (ball.pos.y - ball.radius <= wallD.pos.y + WALL_THICK/2.0):
@@ -83,8 +129,6 @@ def openScene():
                 mode = 3
             elif key == '4':
                 mode = 4
-            elif key == '5':
-                mode = 5
             infoScene.visible = False
             break
     return (speed, mode)

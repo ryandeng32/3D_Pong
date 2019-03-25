@@ -1,6 +1,6 @@
-WALL_X = 120  # 120
-WALL_Y = 30  # 25
-WALL_Z = 30
+WALL_X = 150  # 120
+WALL_Y = 50  # 30
+WALL_Z = 50
 WALL_THICK = 1
 
 
@@ -8,16 +8,17 @@ WALLSIZE = (2 * WALL_Y)
 GT_Y_SIZE = (2 * WALL_Y) / 4.0
 GT_Z_SIZE = (2 * WALL_Y) / 4.0
 
-BALLR = 2
+BALLR = 3
 DEVIATION = 0.005
 P_X = 0.3
-RATE1 = 1000
+RATE = 1000
 RATE2 = 2000
-dT = RATE1 / 1000.0
+dT = RATE / 1000.0
 PPOS = WALL_X - 5
 SCOREPOSX = WALL_X + 2
 SCOREPOSY = WALL_Y - 60
-SCOREPOSZ = 90
-P_Y = 6
-P_Z = 6
+SCOREPOSZ = 180
+P_Y = 8
+P_Z = 8
 PSPEED = (2.5 / dT)
+invisibleBallMultiple = 1.5
