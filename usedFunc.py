@@ -31,18 +31,18 @@ def add_score(scoredP, otherP):
 # the speed of AI is based on difficulty
 def goTowards(ball, p, difficulty):
     # roomY and roomZ is for the AI to hit the ball at an angle
-    roomY = random.randint(0,P_Y/2)
-    roomZ = random.randint(0,P_Z/2)
+    roomY = random.randint(0,round(P_Y/3))
+    roomZ = random.randint(0,round(P_Z/3))
     
     if difficulty == 1:
-        divisor = 140
-    elif difficulty == 2:
-        divisor = 130
-    elif difficulty == 3:
         divisor = 120
+    elif difficulty == 2:
+        divisor = 100
+    elif difficulty == 3:
+        divisor = 70
     # set the default divisor to be 140 
     else:
-        divisor = 140
+        divisor = 100
     if ball.pos.y + roomY > p.pos.y:
         p.pos.y += PSPEED/divisor
     if ball.pos.y + roomY< p.pos.y:
@@ -281,10 +281,10 @@ def openScene():
 
     # change the menu for game mode selection 
     line1.text = "Press 1,2,3,4 to select game mode"
-    line2.text = "Mode_1 -  Practice with just a wall, no scoring"
-    line3.text = "Mode_2 -  Practice with an AI, with fixed goaltenders and scoring"
+    line2.text = "Mode_1 -  Practice with just a wall, no scoring, with obstacles"
+    line3.text = "Mode_2 -  Practice with an AI, with fixed goaltenders and scoring, with obsacles"
     line4.text = "Mode_3 -  2 players with fixed goaltenders and scoring" 
-    line5.text = "Mode_4 -  4 players, 2 players controls pads, 2 players control goaltenders"
+    line5.text = "Mode_4 -  4 players, 2 players controls pads, 2 players control goaltenders, with obstacles"
 
     # wait for the players to choose a game mode 
     while True:
@@ -302,10 +302,28 @@ def openScene():
             # default mode is 1 
             else:
                 mode = 1
+            break
+
+    # display controls for the players based on game mode selected     
+    line1.text = ""
+    line2.text = ""
+    line3.text = ""
+    line4.text = ""
+    line5.text = ""
+    
+    line2.text = "Use arrow keys to move red player"
+    if mode == 3 or mode == 4:
+        line3.text = "Use 'E', 'A', 'C', and 'Z' to move blue player up, left, down, and right"
+    line1.text = "Press any key to continue..."
+
+    # press any key to continue 
+    while True:
+        rate(RATE)
+        if infoScene.kb.keys:
             infoScene.visible = False
             break
 
-    # return speed, difficulty, and mode as a tuple for main.py to unpack
+    # return speed, difficulty, and mode as a tuple for main.py to unpack,
     return (speed, difficulty, mode)
 
 

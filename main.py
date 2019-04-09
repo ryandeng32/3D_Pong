@@ -6,8 +6,8 @@
 ##########################################
 # this file contains the main game loop
 
-# futures, this imports python3 division
-# division in python3 results in a double instead of an int in python2
+# future, this imports the division logic from python3
+# division in python3 results in a double instead of an integer in python2
 from __future__ import division
 
 # other libraries
@@ -16,14 +16,14 @@ from visual import *
 import subprocess
 import random
 
-# these are files that I included for a cleaner code layout
+# these are the files I included for a cleaner code layout
 # settings includes the variables responsible for the configuration of the game
 from settings import *
 # usedFunc includes functions used in the game
 from usedFunc import *
 ############################################################################################################################################################
 
-# set test to true to enter test mode
+# set test to True to enter test mode
 # test mode makes invisible_ball red, and makes the point of view free to adjust
 test = False
 
@@ -56,7 +56,7 @@ scoreBoard1red = box(pos=(SCOREPOSX,SCOREPOSY,-SCOREPOSZ),size=(1,110,2*SCOREPOS
 scoreBoard1blue = box(pos=(SCOREPOSX,SCOREPOSY,SCOREPOSZ),size=(1,110,2*SCOREPOSZ), color = color.blue)
 scoreBoard2red = box(pos=(-SCOREPOSX,SCOREPOSY,-SCOREPOSZ),size=(1,110,2*SCOREPOSZ), color = color.red)
 scoreBoard2blue = box(pos=(-SCOREPOSX,SCOREPOSY,SCOREPOSZ),size=(1,110,2*SCOREPOSZ), color = color.blue)
-# hide score board in mode 1 since it is practice mode
+# hide score board in mode 1 since it is the practice mode
 if mode == 1:
     scoreBoard1red.opacity = 0
     scoreBoard1blue.opacity = 0
@@ -73,7 +73,7 @@ goalTender1 = box(pos=(-(WALL_X-4),0,0),size=(1,GT_Y_SIZE,GT_Z_SIZE),material = 
 # only create goalTender2 when game mode is not 1 
 if mode != 1:
     goalTender2 = box(pos=(WALL_X-4,0,0),size=(1,GT_Y_SIZE,GT_Z_SIZE),material = materials.wood)
-# create obstacles in mode 4, testing 
+# create obstacles in mode 4, mode 2, and mode 1
 if mode == 4 or mode == 2 or mode == 1:
     pyra1 = pyramid(pos=vector(0,0,0), size=vector(20,20,20),color = color.black, opacity = 0.3) 
     pyra2 = pyramid(pos=vector(0,0,0), size=vector(20,20,20),axis = (-1,0,0), opacity = 0.3)
@@ -135,7 +135,6 @@ while not done:
     scene.range = 200
     pauseText1.text = ""
     pauseText2.text = ""
-
     
     # configuring control for player 1(arrow keys)  
     if scene.kb.keys:
@@ -183,9 +182,8 @@ while not done:
             goalTender2.pos = ((WALL_X-4),0,0)
         elif control == '8':
             goalTender2.pos = ((WALL_X-4),0,WALL_Z-GT_Z_SIZE/2)
-            
-
 ############################################################################################################################################################
+
     # make sure players don't move out of the field
     limitPosition(p1)
     if mode != 1:
@@ -197,6 +195,7 @@ while not done:
     # ball collision with p1
     if collisionPlayer(ball,p1, ballSpeed,'-', '<=', '+', 1):
         if mode == 2:
+            # starts the invisible_ball
             go = True
             invisibleBall(invisible_ball,ball)
 
@@ -206,6 +205,7 @@ while not done:
     # ball collision with goalTender1
     if collisionGoalTender(ball, goalTender1, "-", "<=", "+"):
         if mode == 2:
+            # starts the invisible_ball
             go = True
             invisibleBall(invisible_ball,ball)
 
@@ -214,19 +214,20 @@ while not done:
     if mode == 2: 
         collisionWall(invisible_ball, wallU, wallD, wallF, wallB)
 
+    # ball collision with obstacles in mode 4, 2, and 1     
     if mode == 4 or mode == 2 or mode == 1:
         if collisionPyra(ball) and direction == 1:
-            if mode == 2: 
+            if mode == 2:
+                # starts the invisible_ball
                 go = True
                 invisibleBall(invisible_ball,ball)
 
-    # add the result of collision onto ball and invisible_ball
+    # add the resultant velocity of collision onto ball and invisible_ball
     if mode == 2: 
         invisible_ball.pos += invisible_ball.velocity
         if invisible_ball.pos.x > p2.pos.x-5:
             invisible_ball.velocity = vector(0,0,0)
     ball.pos += ball.velocity
-
 ############################################################################################################################################################
 
 # make AI move towards invisible ball when condition is met
@@ -254,8 +255,8 @@ while not done:
         onPause = True
         subprocess.call(["afplay", "hit2.wav"])
 
-
-    # ballboxes and shadow
+    # change the position ballboxes and shadow
+    # the opacity and radius of shadow changes based on the y position of the ball 
     ballBox.pos.x = ball.pos.x
     shadow.pos.z = ball.pos.z
     shadow.pos.x = ball.pos.x
@@ -267,7 +268,7 @@ while not done:
         p1.scoreDisplay.text = str(p1.score)
         p2.scoreDisplay.text = str(p2.score)
         
-    # game over when one player reaches 10 points
+    # game over when one player reaches gamePoints
     if mode != 1:
         if p1.score == gamePoints or p2.score == gamePoints:
             done = True
@@ -319,25 +320,28 @@ while not done:
             go = True
             invisibleBall(invisible_ball,ball)
         onPause = False
-        
-    # when ball is going towards p2
+
+
+    # some configurations based on the direction of the ball 
+    # when ball is going towards p2, direction is 1 
     if ball.velocity.x >= 0:
         direction = 1
         pauseText1.axis=(0,0,-1)
         pauseText2.axis=(0,0,-1)
         if mode != 1 and mode != 2:
+            # set the opacity of ballBox when direction is 1  
             ballBox.opacity =((ball.pos.x-wallL.pos.x)/(2*WALL_X))*0.3
             if not test:
+                # limit the point of view of scene
                 scene.forward=vector(-3,-0.3,0)
             goalTender1.opacity =1
-
             wallL.opacity = 1
             wallR.opacity = 0
+            # configurations of scoreBoards and scoreDisplays 
             p1.scoreDisplay.pos=(-1 * (SCOREPOSX-1),SCOREPOSY, -1 * 200)
             p2.scoreDisplay.pos=(-1 * (SCOREPOSX-1),SCOREPOSY,(200 + 10))
             p1.scoreDisplay.axis=(0,0,-1)
             p2.scoreDisplay.axis=(0,0,-1)
-
             scoreBoard1red.opacity = 0
             scoreBoard1blue.opacity = 0
             scoreBoard2red.opacity = 1
@@ -347,24 +351,25 @@ while not done:
             wallL.opacity = 0
             wallR.opacity = 1
 
-    # when ball is going towards p1
+    # when ball is going towards p1, direction is 2 
     else:
         direction = 2
         pauseText1.axis=(0,0,1)
         pauseText2.axis=(0,0,1)
+        # set the opacity of ballBox when directin is 2 
         ballBox.opacity =0.3-((ball.pos.x-wallL.pos.x)/(2*WALL_X))*0.3
         if not test:
+            # limit the point of view of scene 
             scene.forward=vector(3,-0.3,0)
         goalTender1.opacity = 0.3
         if mode != 1:
-            
             wallL.opacity = 0
             wallR.opacity = 1
+            # configurations of scoreBoards and scoreDisplays
             p1.scoreDisplay.pos=((SCOREPOSX-1),SCOREPOSY, -1 * (200 + 10))
             p2.scoreDisplay.pos=((SCOREPOSX-1),SCOREPOSY, 200)
             p1.scoreDisplay.axis=(0,0,1)
             p2.scoreDisplay.axis=(0,0,1)
-
             scoreBoard1red.opacity = 1
             scoreBoard1blue.opacity = 1
             scoreBoard2red.opacity = 0
@@ -373,11 +378,13 @@ while not done:
         else:
             wallL.opacity = 0
             wallR.opacity = 1
+
+    # when mode is 2, pauseTexts are always facing one direction
     if mode == 2:
         pauseText1.axis=(0,0,1)
         pauseText2.axis=(0,0,1)
-
 ############################################################################################################################################################
+
 # display endgame screen
 scene.visible = False
 # don't display winner if it is single player mode 
